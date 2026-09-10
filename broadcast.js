@@ -1,4 +1,5 @@
 import { getAllGroups, getAllUsers, getProducts, removeGroup } from "./db.js";
+import { getDailyAd } from "./ads.js";
 
 const SEND_DELAY_MS = 200;
 
@@ -104,12 +105,9 @@ export async function sendBroadcast(api, message = null) {
     return;
   }
 
-  const finalMessage = message || buildProductsMessage(products);
+  const finalMessage = message || getDailyAd() || buildProductsMessage(products);
   const result = await sendToGroups(api, finalMessage);
-
-  if (message) {
-    await sendToUsers(api, finalMessage);
-  }
+  await sendToUsers(api, finalMessage);
 
   return result;
 }
