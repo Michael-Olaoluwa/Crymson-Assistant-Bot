@@ -1,4 +1,5 @@
-import { Bot } from "grammy";
+import { Bot, webhookCallback } from "grammy";
+import http from "node:http";
 import cron from "node-cron";
 import "dotenv/config";
 import { addGroup, removeGroup } from "./db.js";
@@ -88,7 +89,34 @@ cron.schedule("0 9 */4 * *", async () => {
 console.log("[cron] Broadcast scheduled: 09:00 every 4 days (cron: '0 9 */4 * *')");
 // ============================================================
 
-// ============ Health check ============
+// ============ HTTP server: /health + (optionally) webhooks ============
+const PORT = Number(process.env.PORT || 3000);
+const secretToken = process.env.WEBHOOK_SECRET_TOKEN || undefined;
+
+const server = http.createServer(async (req, res) => {
+  if (req.method === "GET" && (req.url === "/health" || req.url === "/")) {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("OK");
+    return;
+  }
+
+  try {
+    await webhookCallback(bot, "http", { secretToken })(req, res);
+  } catch (err) {
+    console.error("[webhook] Error:", err.message);
+    if (!res.headersSent) {
+      res.writeHead(500, { "Content-Type": "text/plain" });
+      res.end("error");
+    }
+  }
+});
+
+server.listen(PORT, () => {
+  console.log(`[http] Server listening on port ${PORT}`);
+});
+// ====================================================================
+
+// ============ Health check + startup mode ============
 try {
   const me = await bot.api.getMe();
   console.log(`Connected as @${me.username}. Bot is online!`);
@@ -99,7 +127,17 @@ try {
   );
   process.exit(1);
 }
-// ======================================
 
-bot.start();
-console.log("Crymson Assistant is running...");
+if (process.env.WEBHOOK_URL) {
+  try {
+    await bot.api.setWebhook(process.env.WEBHOOK_URL, { secret_token: secretToken });
+    console.log(`[webhook] Registered webhook at ${process.env.WEBHOOK_URL}`);
+  } catch (err) {
+    console.error("[webhook] setWebhook failed, falling back to polling:", err.message);
+    bot.start();
+  }
+  console.log("Crymson Assistant is running (webhook mode)...");
+} else {
+  bot.start();
+  console.log("Crymson Assistant is running (polling mode)...");
+}

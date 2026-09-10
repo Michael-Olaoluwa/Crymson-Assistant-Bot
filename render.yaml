@@ -1,9 +1,10 @@
 services:
-  - type: worker
+  - type: web
     name: crymson-assistant
     runtime: node
     buildCommand: npm install
     startCommand: node index.js
+    healthCheckPath: /health
     envVars:
       - key: BOT_TOKEN
         sync: false
@@ -12,4 +13,8 @@ services:
       - key: SUPABASE_ANON_KEY
         sync: false
       - key: ADMIN_TELEGRAM_ID
+        sync: false
+      - key: WEBHOOK_URL
+        sync: false
+      - key: WEBHOOK_SECRET_TOKEN
         sync: false
