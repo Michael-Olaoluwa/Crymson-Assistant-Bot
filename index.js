@@ -95,11 +95,8 @@ const secretToken = process.env.WEBHOOK_SECRET_TOKEN || undefined;
 const useWebhook = Boolean(process.env.WEBHOOK_URL);
 
 // NOTE: webhookCallback() swaps out bot.start(); it must only be created
-// when we actually intend to run in webhook mode, and created ONCE.
+// after a successful setWebhook, and created ONCE.
 let webhookHandler = null;
-if (useWebhook) {
-  webhookHandler = webhookCallback(bot, "http", { secretToken });
-}
 
 const server = http.createServer((req, res) => {
   if (req.method === "GET" && (req.url === "/health" || req.url === "/")) {
@@ -143,11 +140,16 @@ try {
 if (useWebhook) {
   try {
     await bot.api.setWebhook(process.env.WEBHOOK_URL, { secret_token: secretToken });
+    webhookHandler = webhookCallback(bot, "http", { secretToken });
     console.log(`[webhook] Registered webhook at ${process.env.WEBHOOK_URL}`);
     console.log("Crymson Assistant is running (webhook mode)...");
   } catch (err) {
-    console.error("[webhook] setWebhook failed:", err.message);
-    process.exit(1);
+    console.error(
+      "[webhook] setWebhook failed. WEBHOOK_SECRET_TOKEN must use only A-Z, a-z, 0-9, _ and -:",
+      err.message
+    );
+    await bot.start();
+    console.log("Crymson Assistant is running (polling mode, fallback)...");
   }
 } else {
   await bot.start();
