@@ -74,10 +74,10 @@ bot.catch((err) => {
   console.error("[bot] Unhandled error:", err.message || err);
 });
 
-// ============ Scheduled broadcast (every 4 days) ============
+// ============ Scheduled broadcast (every day) ============
 // Cron format: minute hour day-of-month month day-of-week
-// "0 9 */4 * *" = 09:00 on every day-of-month divisible by 4 (e.g. 4th, 8th, 12th...)
-cron.schedule("0 9 */4 * *", async () => {
+// "0 9 * * *" = 09:00 every day
+cron.schedule("0 9 * * *", async () => {
   console.log("[cron] Running scheduled broadcast...");
   try {
     await sendBroadcast(bot.api);
@@ -86,7 +86,7 @@ cron.schedule("0 9 */4 * *", async () => {
     console.error("[cron] Scheduled broadcast error:", err.message);
   }
 });
-console.log("[cron] Broadcast scheduled: 09:00 every 4 days (cron: '0 9 */4 * *')");
+console.log("[cron] Broadcast scheduled: 09:00 every day (cron: '0 9 * * *')");
 // ============================================================
 
 // ============ HTTP server: /health + (optionally) webhooks ============
