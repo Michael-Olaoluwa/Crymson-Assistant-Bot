@@ -92,23 +92,35 @@ console.log("[cron] Broadcast scheduled: 09:00 every 4 days (cron: '0 9 */4 * *'
 // ============ HTTP server: /health + (optionally) webhooks ============
 const PORT = Number(process.env.PORT || 3000);
 const secretToken = process.env.WEBHOOK_SECRET_TOKEN || undefined;
+const useWebhook = Boolean(process.env.WEBHOOK_URL);
 
-const server = http.createServer(async (req, res) => {
+// NOTE: webhookCallback() swaps out bot.start(); it must only be created
+// when we actually intend to run in webhook mode, and created ONCE.
+let webhookHandler = null;
+if (useWebhook) {
+  webhookHandler = webhookCallback(bot, "http", { secretToken });
+}
+
+const server = http.createServer((req, res) => {
   if (req.method === "GET" && (req.url === "/health" || req.url === "/")) {
     res.writeHead(200, { "Content-Type": "text/plain" });
     res.end("OK");
     return;
   }
 
-  try {
-    await webhookCallback(bot, "http", { secretToken })(req, res);
-  } catch (err) {
-    console.error("[webhook] Error:", err.message);
-    if (!res.headersSent) {
-      res.writeHead(500, { "Content-Type": "text/plain" });
-      res.end("error");
-    }
+  if (useWebhook && webhookHandler) {
+    webhookHandler(req, res).catch((err) => {
+      console.error("[webhook] Error:", err.message);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "text/plain" });
+        res.end("error");
+      }
+    });
+    return;
   }
+
+  res.writeHead(404, { "Content-Type": "text/plain" });
+  res.end("Not found");
 });
 
 server.listen(PORT, () => {
@@ -128,16 +140,16 @@ try {
   process.exit(1);
 }
 
-if (process.env.WEBHOOK_URL) {
+if (useWebhook) {
   try {
     await bot.api.setWebhook(process.env.WEBHOOK_URL, { secret_token: secretToken });
     console.log(`[webhook] Registered webhook at ${process.env.WEBHOOK_URL}`);
+    console.log("Crymson Assistant is running (webhook mode)...");
   } catch (err) {
-    console.error("[webhook] setWebhook failed, falling back to polling:", err.message);
-    bot.start();
+    console.error("[webhook] setWebhook failed:", err.message);
+    process.exit(1);
   }
-  console.log("Crymson Assistant is running (webhook mode)...");
 } else {
-  bot.start();
+  await bot.start();
   console.log("Crymson Assistant is running (polling mode)...");
 }
