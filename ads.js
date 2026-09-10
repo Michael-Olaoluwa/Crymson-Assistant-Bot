@@ -287,6 +287,59 @@ export const ads = [
       `Use them together and watch the days get easier.\n\n` +
       `🚀 [Start here](https://jobalat-sage-vercel.app) · [or here](https://watch-tower-jet.vercel.app/) · [or here](https://eazeshare.vercel.app)`,
   },
+
+  // ===== Problem collection (Tally survey) =====
+  {
+    title: "Problem survey",
+    text:
+      `*Have a problem worth solving?* 🛠️\n\n` +
+      `You use tools every day. Some frustrate you. Some blow your mind.\n\n` +
+      `Crymson wants to build what YOU actually need.\n\n` +
+      `Take 30 seconds to tell us what bugs you — anonymous, no email.\n\n` +
+      `🙏 [Share it here](https://tally.so/r/jaRWPx)`,
+  },
+  {
+    title: "Problem survey",
+    text:
+      `*Shape what Crymson builds next* 🏗️\n\n` +
+      `We don't guess. We ask.\n\n` +
+      `Is there something that should exist but doesn't? A tool that should work better? A process that's painful?\n\n` +
+      `Drop it in 30 seconds — anonymous, no email, zero strings.\n\n` +
+      `👉 [Tell us your problem](https://tally.so/r/jaRWPx)`,
+  },
+  {
+    title: "Problem survey",
+    text:
+      `*30 seconds that could change your workflow* ⏱️\n\n` +
+      `The best apps are born from real frustrations. Yours could be next.\n\n` +
+      `And yeah — it's anonymous. No email. No follow-ups. Just your honest problem.\n\n` +
+      `💬 [Spill it here](https://tally.so/r/jaRWPx)`,
+  },
+  {
+    title: "Problem survey",
+    text:
+      `*Crymson has a question for you* 🎤\n\n` +
+      `What's the one thing that annoys you about the tools you use?\n\n` +
+      `Your answer might literally be the next thing we build.\n\n` +
+      `30 seconds. Anonymous. No email needed.\n\n` +
+      `🙏 [Answer here](https://tally.so/r/jaRWPx)`,
+  },
+  {
+    title: "Problem survey",
+    text:
+      `*Your problem is our roadmap* 🗺️\n\n` +
+      `Every product starts with someone saying "there has to be a better way."\n\n` +
+      `That someone is you. Tell us where it hurts — 30 seconds, anonymous, no email.\n\n` +
+      `[Drop it here](https://tally.so/r/jaRWPx) — we're listening. 👂`,
+  },
+  {
+    title: "Problem survey",
+    text:
+      `*Be the reason something gets built* ✨\n\n` +
+      `We're starting with real problems, not guesses. Yours included.\n\n` +
+      `60 seconds max. Anonymous. No email. Just share the frustration you deal with daily.\n\n` +
+      `🚀 [Fill it in](https://tally.so/r/jaRWPx)`,
+  },
 ];
 
 // Pick a different ad each day by rotating through the pool.
